@@ -27,14 +27,14 @@ def show_image(img):
     else:
         pass
 
-def gen_video(imgs, size=(1920, 1080), filename='test.avi'):
-    FPS = 24
+def gen_video(imgs, size=(1920, 1080), filename='test.mp4'):
+    FPS = 25
     seconds = 5
     radius = 150
 
-    fourcc = VideoWriter_fourcc(*'MP42')
+    fourcc = VideoWriter_fourcc(*'avc1')
     video = VideoWriter(filename, fourcc, float(FPS), size)
-    frame = np.random.randint(0, 256,
+    frame = np.random.randint(220, 221,
                               (size[1], size[0], 3),
                               dtype=np.uint8)
 
@@ -43,7 +43,7 @@ def gen_video(imgs, size=(1920, 1080), filename='test.avi'):
 
     for img in imgs:
         info = img[0].shape
-        frame = np.random.randint(0, 256,
+        frame = np.random.randint(220, 221,
                                   (size[1], size[0], 3),
                                   dtype=np.uint8)
         # if info[0] > size[0]:
@@ -60,7 +60,7 @@ def gen_video(imgs, size=(1920, 1080), filename='test.avi'):
     img = cv2.imread('res/test.jpg')
     info = img.shape
     for i in range(0, 1080, 10):
-        frame = np.random.randint(0, 256,
+        frame = np.random.randint(220, 221,
                                   (size[1], size[0], 3),
                                   dtype=np.uint8)
         try:
@@ -70,7 +70,7 @@ def gen_video(imgs, size=(1920, 1080), filename='test.avi'):
         except:
             pass
     for i in range(0, 1920, 10):
-        frame = np.random.randint(0, 256,
+        frame = np.random.randint(220, 221,
                                   (size[1], size[0], 3),
                                   dtype=np.uint8)
         try:
@@ -88,6 +88,7 @@ def gen_images(image='res/test.jpg'):
     height=info[0]
     weight=info[1]
     mode=info[2]
+    print("height: %d weight: %d"%(height, weight))
     imgs = []
     show_image(img)
     print("resize")
@@ -104,7 +105,8 @@ def gen_images(image='res/test.jpg'):
     show_image(imgs[2])
     print("cut")
     # cut
-    to = ['10:20,10:30', '100:200,100:300', '200:800,300:700']
+    to = ['10:20,10:30', '300:445, 0:354', '0:250, 20:354', '100:200,100:300', '200:800,300:700']
+    #img[y:y + h, x:x + w]
     for i in to:
         a,b = i.split(',')
         print("\t%s, %s" % (a, b))
@@ -133,12 +135,26 @@ def gen_images(image='res/test.jpg'):
         grey_3_channel = cv2.cvtColor(grey, cv2.COLOR_GRAY2BGR)
 
         vertical = np.vstack((image, grey_3_channel))
+        info = vertical.shape
+        height = info[0]
+        weight = info[1]
+        imgs.append((vertical, 'concat y: %d x: %d'% (height, weight)))
         horizontal = np.hstack((image, grey_3_channel))
-
+        info = horizontal.shape
+        height = info[0]
+        weight = info[1]
+        imgs.append((horizontal, 'concat y: %d x: %d'% (height, weight)))
         vertical_concat = np.concatenate((image, grey_3_channel), axis=0)
+        info = vertical_concat.shape
+        height = info[0]
+        weight = info[1]
+        imgs.append((vertical_concat, 'vertical_concat y: %d x: %d'% (height, weight)))
         horizontal_concat = np.concatenate((image, grey_3_channel), axis=1)
+        info = horizontal_concat.shape
+        height = info[0]
+        weight = info[1]
+        imgs.append((horizontal_concat, 'concat y: %d x: %d'% (height, weight)))
 
-        imgs.extend([(vertical,'concat'), (horizontal,'concat'), (vertical_concat,'concat'), (horizontal_concat, 'concat')])
         show_image(imgs[-1])
     print("merge & resize")
     img = cv2.resize(img, (1920, int(1080 * weight /height)))
@@ -177,4 +193,4 @@ def gen_images(image='res/test.jpg'):
 if __name__ == '__main__':
     imgs = gen_images()
     gen_video(imgs)
-    os.system('ffmpeg -i test.avi -vcodec libx264 test.mp4;rm -rf test.avi')
+    #os.system('ffmpeg -i test.avi -vcodec libx264 test.mp4;rm -rf test.avi')
