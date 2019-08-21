@@ -30,6 +30,7 @@ def show_image(img):
 def gen_video(imgs, size=(1920, 1080), filename='test.mp4'):
     FPS = 25
     seconds = 5
+    radius = 150
 
     fourcc = VideoWriter_fourcc(*'avc1')
     video = VideoWriter(filename, fourcc, float(FPS), size)
@@ -39,25 +40,6 @@ def gen_video(imgs, size=(1920, 1080), filename='test.mp4'):
 
     add_text(frame, 'begining')
     repeat(video.write, FPS * seconds, frame)
-
-    for img in imgs:
-        info = img[0].shape
-        x = (size[1] - info[0]) // 2
-        y = (size[0] - info[1]) // 2
-        frame = np.random.randint(220, 221,
-                                  (size[1], size[0], 3),
-                                  dtype=np.uint8)
-        try:
-            frame[x:(info[0] + x), y:(info[1] + y)] = img[0]
-            add_text(frame, img[1])
-            repeat(video.write, FPS * seconds, frame)
-        except:
-            print("failed to porcess ")
-            frame = cv2.resize(img[0], (1080, 1920))
-            add_text(frame, img[1])
-            repeat(video.write, FPS * seconds, frame)
-
-
     mulface = cv2.imread('res/mulperson.jpg')
     info = mulface.shape
     x = (size[1] - info[0])//2
@@ -87,94 +69,59 @@ def gen_video(imgs, size=(1920, 1080), filename='test.mp4'):
             frame = np.random.randint(220, 221,
                                       (size[1], size[0], 3),
                                       dtype=np.uint8)
-            try:
-                frame[i:i+info[0],0:0+info[1]]=img
-                add_text(frame, 'moving')
-                video.write(frame)
-            except:
-                pass
+            frame[i:i+info[0],0:0+info[1]]=img
+            add_text(frame, 'moving')
+            video.write(frame)
         for i in range(0, 1920, 10):
-            try:
-                frame = np.random.randint(220, 221,
+            frame = np.random.randint(220, 221,
                                       (size[1], size[0], 3),
                                       dtype=np.uint8)
-                frame[0:info[0],i:i+info[1]]=img
-                add_text(frame, 'moving')
-                video.write(frame)
-            except:
-                pass
-    src = walk_dir("./src/")
-    for imgfile in src:
-        img = cv2.imread(imgfile)
-        info = img.shape
-        x = (size[1] - info[0]) // 2
-        y = (size[0] - info[1]) // 2
-        frame = np.random.randint(220, 221,
-                                  (size[1], size[0], 3),
-                                  dtype=np.uint8)
-        try:
-            frame[x:(info[0] + x), y:(info[1] + y)] = img
-            repeat(video.write, FPS * seconds, frame)
-        except:
-            print("failed to porcess ")
-            frame = cv2.resize(img, (1080, 1920))
-            repeat(video.write, FPS * seconds, frame)
+            frame[0:info[0],i:i+info[1]]=img
+            add_text(frame, 'moving')
+            video.write(frame)
     video.release()
 
-def gen_images(files=None):
-    index = 0
-    print("resize")
+def gen_images(image='res/test.jpg'):
+
+    img=cv2.imread(image)
+    info=img.shape
+    height=info[0]
+    weight=info[1]
+    mode=info[2]
+    print("height: %d weight: %d"%(height, weight))
     imgs = []
+    show_image(img)
+    print("resize")
     # resize
     to = [30, 60, 120, 480, 720, 1080]
     for i in to:
-        img = cv2.imread(files[index])
-        info = img.shape
-        height = info[0]
-        weight = info[1]
-        mode = info[2]
-        print("height: %d weight: %d" % (height, weight))
-        show_image(img)
         dstHeight= i
         dstWeight=int(i / height  * weight)
         print("\t%d, %d" % (dstHeight, dstWeight))
         dst = cv2.resize(img, (dstHeight, dstWeight))
         imgs.append((dst, 'resize y: %d x: %d'% (dstHeight, dstWeight)))
-        index += 1
 
+
+    show_image(imgs[2])
     print("cut")
     # cut
     to = ['10:20,10:30', '300:445, 0:354', '0:250, 20:354', '100:200,100:300', '200:800,300:700']
     #img[y:y + h, x:x + w]
     for i in to:
-        img = cv2.imread(files[index])
-        info = img.shape
-        height = info[0]
-        weight = info[1]
-        mode = info[2]
-        print("height: %d weight: %d" % (height, weight))
         a,b = i.split(',')
         print("\t%s, %s" % (a, b))
         a1, a2 = a.split(':')
         b1, b2 = b.split(':')
         dst=img[int(a1):int(a2),int(b1):int(b2)]
         imgs.append((dst, 'cut %s' % (i)))
-        index += 1
 
     print("rotate")
     #rotate
-    to = [45, 90, 135, 180, 225, 270, 315]
+    to = [45, 90, 180, 225]
     for i in to:
-        img = cv2.imread(files[index])
-        info = img.shape
-        height = info[0]
-        weight = info[1]
-        mode = info[2]
-        print("height: %d weight: %d" % (height, weight))
         mat_rotate=cv2.getRotationMatrix2D((height*0.5,weight*0.5),i,1)    #center angle 3scale
         dst=cv2.warpAffine(img,mat_rotate,(height,weight))
         imgs.append((dst, 'rotate'))
-        index += 1
 
     show_image(imgs[-1])
     show_image(imgs[-5])
@@ -182,13 +129,6 @@ def gen_images(files=None):
     # merge
     print("merge")
     for i in [0.5, 1, 4, 8]:
-        img = cv2.imread(files[index])
-        info = img.shape
-        height = info[0]
-        weight = info[1]
-        mode = info[2]
-        print("height: %d weight: %d" % (height, weight))
-
         image = cv2.resize(img, (0, 0), None, 1/i, 1/i)
 
         grey = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
@@ -215,31 +155,17 @@ def gen_images(files=None):
         weight = info[1]
         imgs.append((horizontal_concat, 'concat y: %d x: %d'% (height, weight)))
 
-        index += 1
-
         show_image(imgs[-1])
     print("merge & resize")
-
     img = cv2.resize(img, (1920, int(1080 * weight /height)))
-    for i in [0.25, 0.5, 1, 2, 4, 8, 16, 32]:
-        img = cv2.imread(files[index])
-        info = img.shape
-        height = info[0]
-        weight = info[1]
-        mode = info[2]
-        print("height: %d weight: %d" % (height, weight))
+    for i in [2, 4, 8, 16, 32]:
         image = cv2.resize(img, (0, 0), None, 1/i, 1/i)
         m = image
         n = image
-        if int(i) > 1:
-            for j in range(i):
-                m = np.vstack((m, image))
-                n = np.hstack((m, m))
-        else:
+        for j in range(i):
             m = np.vstack((m, image))
-            n = np.hstack((m, m))
+            n = np.hstack((n, image))
         imgs.extend([(m, 'merge & resize'),(n, 'merge & resize')])
-        index += 1
 
     # no face
     print("no face")
@@ -263,16 +189,8 @@ def gen_images(files=None):
     return imgs
 
 
-def walk_dir(dir, topdown=True):
-    imgs = []
-    for root, dirs, files in os.walk(dir, topdown):
-        for name in files:
-            if name.endswith('.jpg'):
-                imgs.append(os.path.join(root, name))
-    return imgs
-
 
 if __name__ == '__main__':
-    files = walk_dir("./res/")
-    imgs = gen_images(files)
+    imgs = gen_images()
     gen_video(imgs)
+    #os.system('ffmpeg -i test.avi -vcodec libx264 test.mp4;rm -rf test.avi')
