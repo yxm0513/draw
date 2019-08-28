@@ -28,7 +28,7 @@ def show_image(img):
         pass
 
 def gen_video(imgs, size=(1920, 1080), filename='test.mp4'):
-    FPS = 25
+    FPS = 10
     seconds = 5
 
     fourcc = VideoWriter_fourcc(*'avc1')
