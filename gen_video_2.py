@@ -43,7 +43,7 @@ def gen_video(imgs, size=(1920, 1080), filename='test.mp4'):
 
     for i in range(4):
         # many people
-        mulface = cv2.imread('res/mulperson.jpg')
+        mulface = cv2.imread('../test/res/mulperson.jpg')
         info = mulface.shape
         frame = np.random.randint(220, 221,
                                   (size[1], size[0], 3),
@@ -59,7 +59,7 @@ def gen_video(imgs, size=(1920, 1080), filename='test.mp4'):
             pass
 
         # moving
-        img = cv2.imread('res/test.jpg')
+        img = cv2.imread('../test/res/test.jpg')
         info = img.shape
         for i in range(0, 1080, 10):
             frame = np.random.randint(220, 221,
@@ -83,7 +83,7 @@ def gen_video(imgs, size=(1920, 1080), filename='test.mp4'):
                 pass
     video.release()
 
-def gen_images(image='res/test.jpg'):
+def gen_images(image='../test/res/test.jpg'):
 
     img=cv2.imread(image)
     info=img.shape
@@ -171,11 +171,11 @@ def gen_images(image='res/test.jpg'):
 
     # no face
     print("no face")
-    noface = cv2.imread('res/error_face.jpg')
+    noface = cv2.imread('../test/res/error_face.jpg')
     imgs.append((noface, 'no face'))
     print("many face")
     # many people
-    mulface = cv2.imread('res/mulperson.jpg')
+    mulface = cv2.imread('../test/res/mulperson.jpg')
     imgs.append((mulface, 'mul face'))
 
     img = cv2.resize(mulface, (1920, int(1080 * weight /height)))

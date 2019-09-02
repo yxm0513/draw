@@ -40,7 +40,7 @@ def gen_video(size=(1920, 1080), filename='test.mp4'):
     add_text(frame, 'begining')
     repeat(video.write, FPS * seconds, frame)
 
-    src = walk_dir("./imagesresized/")
+    src = walk_dir("../test/imagesresized/")
     for imgfile in src:
         print(imgfile + "\n")
         img = cv2.imread(imgfile)

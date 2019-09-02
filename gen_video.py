@@ -58,7 +58,7 @@ def gen_video(imgs, size=(1920, 1080), filename='test.mp4'):
             repeat(video.write, FPS * seconds, frame)
 
 
-    mulface = cv2.imread('res/mulperson.jpg')
+    mulface = cv2.imread('../test/res/mulperson.jpg')
     info = mulface.shape
     x = (size[1] - info[0])//2
     y = (size[0] - info[1])//2
@@ -243,11 +243,11 @@ def gen_images(files=None):
 
     # no face
     print("no face")
-    noface = cv2.imread('res/error_face.jpg')
+    noface = cv2.imread('../test/res/error_face.jpg')
     imgs.append((noface, 'no face'))
     print("many face")
     # many people
-    mulface = cv2.imread('res/mulperson.jpg')
+    mulface = cv2.imread('../test/res/mulperson.jpg')
     imgs.append((mulface, 'mul face'))
 
     img = cv2.resize(mulface, (1920, int(1080 * weight /height)))
@@ -273,6 +273,6 @@ def walk_dir(dir, topdown=True):
 
 
 if __name__ == '__main__':
-    files = walk_dir("./res/")
+    files = walk_dir("../test/res/")
     imgs = gen_images(files)
     gen_video(imgs)
