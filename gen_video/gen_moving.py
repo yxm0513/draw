@@ -28,8 +28,8 @@ def show_image(img):
         pass
 
 def gen_video(size=(1920, 1080), filename='test.mp4'):
-    FPS = 10
-    seconds = 3
+    FPS = 25
+    seconds = 4
 
     fourcc = VideoWriter_fourcc(*'avc1')
     video = VideoWriter(filename, fourcc, float(FPS), size)
@@ -70,8 +70,12 @@ def gen_video(size=(1920, 1080), filename='test.mp4'):
             print(str(i[1]) + ":" + str(info[1] + i[1]) + "\n")
             frame[i[0]:(info[0] + i[0]), i[1]:(info[1] + i[1])] = img
             repeat(video.write, FPS * seconds, frame)
+            frame = np.random.randint(220, 221,
+                                      (size[1], size[0], 3),
+                                      dtype=np.uint8)
+            repeat(video.write, int(FPS * 1.5), frame)
 
-        for i in range(0, 1080, 10):
+        for i in range(0, 1080, 5):
             frame = np.random.randint(220, 221,
                                       (size[1], size[0], 3),
                                       dtype=np.uint8)
@@ -84,7 +88,11 @@ def gen_video(size=(1920, 1080), filename='test.mp4'):
                 video.write(frame)
             except:
                 pass
-        for i in range(0, 1920, 10):
+        frame = np.random.randint(220, 221,
+                                  (size[1], size[0], 3),
+                                  dtype=np.uint8)
+        repeat(video.write, int(FPS * 1.5), frame)
+        for i in range(0, 1920, 5):
             try:
             #if i+info[1] <= 1920:
                 frame = np.random.randint(220, 221,
@@ -95,6 +103,10 @@ def gen_video(size=(1920, 1080), filename='test.mp4'):
                 video.write(frame)
             except:
                 pass
+        frame = np.random.randint(220, 221,
+                                  (size[1], size[0], 3),
+                                  dtype=np.uint8)
+        repeat(video.write, int(FPS * 1.5), frame)
     video.release()
 
 
@@ -102,7 +114,7 @@ def walk_dir(dir, topdown=True):
     imgs = []
     for root, dirs, files in os.walk(dir, topdown):
         for name in files:
-            if name.endswith('.jpg'):
+            if name.endswith('.png'):
                 imgs.append(os.path.join(root, name))
     return imgs
 
